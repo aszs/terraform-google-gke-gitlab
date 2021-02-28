@@ -8,12 +8,30 @@ global:
     externalIP: ${INGRESS_IP}
     ssh: ~
 
+  communityImages:
+    # Default repositories used to pull Gitlab Community Edition images.
+    # See the image.repository and workhorse.repository template helpers.
+    migrations:
+      repository: registry.gitlab.com/aszs/cng/gitlab-task-runner-ce
+    sidekiq:
+      repository: registry.gitlab.com/aszs/cng/gitlab-sidekiq-ce
+    task-runner:
+      repository: registry.gitlab.com/aszs/cng/gitlab-task-runner-ce
+    webservice:
+      repository: registry.gitlab.com/aszs/cng/gitlab-webservice-ce
+    workhorse:
+      repository: registry.gitlab.com/aszs/cng/gitlab-workhorse-ce
+
   ## doc/charts/globals.md#configure-ingress-settings
   ingress:
     configureCertmanager: true
     enabled: true
     tls:
       enabled: true
+    annotations:
+      external-dns.alpha.kubernetes.io/ttl: 10
+      external-dns.alpha.kubernetes.io/hostname: ${DOMAIN}.
+
 
   ## doc/charts/globals.md#configure-postgresql-settings
   psql:
@@ -93,6 +111,20 @@ gitlab:
           secret: google-application-credentials
           key: gcs-application-credentials-file
           gcpProject: ${PROJECT_ID}
+  # oc
+    image:
+      tag: master
+  migrations:
+    image:
+      tag: master
+  sidekiq:
+    image:
+      tag: master
+  webservice:
+    image:
+      tag: master
+    workhorse:
+      tag: master
 
 postgresql:
   install: false

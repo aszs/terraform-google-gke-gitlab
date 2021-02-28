@@ -74,7 +74,13 @@ module "project_services" {
     "container.googleapis.com",
     "servicenetworking.googleapis.com",
     "cloudresourcemanager.googleapis.com",
-    "redis.googleapis.com"
+    "redis.googleapis.com",
+
+    "serviceusage.googleapis.com",
+    "cloudbilling.googleapis.com",
+    "cloudkms.googleapis.com",
+    "storage-api.googleapis.com",
+    "dns.googleapis.com",
   ]
 }
 
@@ -85,13 +91,19 @@ resource "google_service_account" "gitlab_gcs" {
   display_name = "GitLab Cloud Storage"
 }
 
+resource "google_service_account_iam_member" "gitlab_gcs_iam" {
+  service_account_id = google_service_account.gitlab_gcs.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             =  "serviceAccount:${var.project_id}.svc.id.goog[kube-system/external-dns]"
+}
+
 resource "google_service_account_key" "gitlab_gcs" {
   service_account_id = google_service_account.gitlab_gcs.name
 }
 
 resource "google_project_iam_member" "project" {
   project = var.project_id
-  role    = "roles/storage.admin"
+  roles    = ["roles/storage.admin", "roles/dns.admin"]
   member  = "serviceAccount:${google_service_account.gitlab_gcs.email}"
 }
 
@@ -268,8 +280,19 @@ module "gke" {
     },
   ]
 
+  # see https://github.com/kubernetes-sigs/external-dns/issues/509
+  # and gitlab-chart/scripts/gke_bootstrap_script.sh
   node_pools_oauth_scopes = {
-    all = ["https://www.googleapis.com/auth/cloud-platform"]
+    all = ["https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/ndev.clouddns.readwrite",
+      "https://www.googleapis.com/auth/compute",
+      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/logging.write",
+      "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/servicecontrol",
+      "https://www.googleapis.com/auth/service.management.readonly",
+      "https://www.googleapis.com/auth/trace.append"
+    ]
   }
 }
 
@@ -362,7 +385,7 @@ locals {
 }
 
 data "template_file" "helm_values" {
-  template = "${file("${path.module}/values.yaml.tpl")}"
+  template = file("${path.module}/values.yaml.tpl")
 
   vars = {
     DOMAIN                = local.domain
@@ -399,5 +422,28 @@ resource "helm_release" "gitlab" {
     kubernetes_secret.gitlab_registry_storage,
     kubernetes_secret.gitlab_gcs_credentials,
     time_sleep.sleep_for_cluster_fix_helm_6361,
+  ]
+}
+
+resource "helm_release" "external_dns" {
+  name       = "external-dns"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "external-dns"
+  version    = "3.3.1"
+  timeout    = 1200
+  namespace   = "kube-system"
+  values =  [
+  <<-EOT
+    provider: google
+    google:
+      project: ${var.project_id}
+    txtOwnerId: gitlab
+    rbac:
+      create: true
+    policy: sync
+    domainFilters: [${local.domain}]
+    serviceAccount:
+      annotations: ${google_service_account.gitlab_gcs.email}
+  EOT
   ]
 }
