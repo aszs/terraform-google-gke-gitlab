@@ -91,20 +91,33 @@ resource "google_service_account" "gitlab_gcs" {
   display_name = "GitLab Cloud Storage"
 }
 
-resource "google_service_account_iam_member" "gitlab_gcs_iam" {
-  service_account_id = google_service_account.gitlab_gcs.name
-  role               = "roles/iam.workloadIdentityUser"
-  member             =  "serviceAccount:${var.project_id}.svc.id.goog[kube-system/external-dns]"
-}
-
 resource "google_service_account_key" "gitlab_gcs" {
   service_account_id = google_service_account.gitlab_gcs.name
 }
 
 resource "google_project_iam_member" "project" {
   project = var.project_id
-  roles    = ["roles/storage.admin", "roles/dns.admin"]
+  role    = "roles/storage.admin"
   member  = "serviceAccount:${google_service_account.gitlab_gcs.email}"
+}
+
+// external-dns service account
+resource "google_service_account" "gitlab_dns" {
+  project      = var.project_id
+  account_id   = "gitlab-dns"
+  display_name = "External DNS"
+}
+
+resource "google_service_account_iam_member" "gitlab_dns_iam" {
+  service_account_id = google_service_account.gitlab_dns.name
+  role               = "roles/iam.workloadIdentityUser"
+  member             =  "serviceAccount:${var.project_id}.svc.id.goog[kube-system/external-dns]"
+}
+
+resource "google_project_iam_member" "external_dns" {
+  project = var.project_id
+  role    = "roles/dns.admin"
+  member  = "serviceAccount:${google_service_account.gitlab_dns.email}"
 }
 
 // Networking
@@ -443,7 +456,7 @@ resource "helm_release" "external_dns" {
     policy: sync
     domainFilters: [${local.domain}]
     serviceAccount:
-      annotations: ${google_service_account.gitlab_gcs.email}
+      annotations: ${google_service_account.gitlab_dns.email}
   EOT
   ]
 }

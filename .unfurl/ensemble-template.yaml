@@ -26,10 +26,10 @@ spec:
                     # terraform module expects a source to be a relative path
                     template: >
                       module "gke-gitlab" {
-                        source  = "../.."
-                        project_id         = "{{ {get_input: project_id} }}"
-                        certmanager_email  = "{{ {get_input: certmanager_email} }}"
-                        domain = "{{ {get_input: domain} }}"
+                        source  = "../../.."
+                        project_id         = "{{ '::inputs::project_id' | eval }}"
+                        certmanager_email  = "{{ '::inputs::certmanager_email' | eval }}"
+                        domain = "{{ '::inputs::domain' | eval }}"
                       }
 
                       output "gitlab_url" {
