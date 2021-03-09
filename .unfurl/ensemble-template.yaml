@@ -17,6 +17,11 @@ spec:
           interfaces:
             defaults:
               inputs:
+                tfvars:
+                  sendgrid_apikey:
+                    eval:
+                      secret:
+                        sendgrid_apikey
                 resultTemplate: |
                   # merge all outputs into attributes
                   attributes:
@@ -71,7 +76,3 @@ spec:
                         description = "Token for the GKE cluster that GitLab is deployed in."
                         sensitive = true
                       }
-                  vars:
-                    module_path:
-                      eval:
-                        get_dir: "terraform-google-gke-gitlab"

@@ -86,3 +86,9 @@ variable "helm_chart_version" {
   default     = "4.2.4"
   description = "Helm chart version to install during deployment"
 }
+
+variable "sendgrid_apikey" {
+  type        = string
+  default     = ""
+  // sensitive   = true // uncomment when we upgrade to terraform 0.14
+}
