@@ -1,5 +1,25 @@
 # terraform-google-gke-gitlab
 
+This fork of [terraform-google-gke-gitlab](https://github.com/terraform-google-modules/terraform-google-gke-gitlab) adds support for [external-dns](https://github.com/kubernetes-sigs/external-dns) and adds an Unfurl project for deploying it.
+
+To use:
+
+1. `unfurl clone https://github.com/aszs/terraform-google-gke-gitlab.git`
+
+2. edit `.unfurl/ensemble/ensemble.yaml` and add the appropriate templates inputs:
+
+    spec:
+      inputs:
+        project_id: XXX
+        certmanager_email: XXX
+        domain: XXX
+
+3. deploy:
+
+`unfurl deploy --dryrun`  (use --dryrun to test without actually deploying)
+
+# Original Readme:
+
 This module creates a reslient and fault tolerant GitLab installation using Google
 Kubernetes Engine (GKE) as the computing environment and the following services for storing
 data:
