@@ -35,44 +35,51 @@ spec:
                         project_id         = "{{ '::inputs::project_id' | eval }}"
                         certmanager_email  = "{{ '::inputs::certmanager_email' | eval }}"
                         domain = "{{ '::inputs::domain' | eval }}"
+                        sendgrid_apikey = var.sendgrid_apikey
+                      }
+
+                      variable "sendgrid_apikey" {
+                        type        = string
+                        default     = ""
+                        // sensitive   = true // uncomment when we upgrade to terraform 0.14
                       }
 
                       output "gitlab_url" {
-                        value = "${module.gke-gitlab.gitlab_url}"
+                        value = module.gke-gitlab.gitlab_url
                       }
 
                       output "root_password_instructions" {
-                        value = "${module.gke-gitlab.root_password_instructions}"
+                        value = module.gke-gitlab.root_password_instructions
                       }
 
                       output "gitlab_address" {
-                        value       = "${module.gke-gitlab.gitlab_address}"
+                        value       = module.gke-gitlab.gitlab_address
                         description = "IP address where you can connect to your GitLab instance"
                       }
 
                       output "cluster_name" {
-                        value       = "${module.gke-gitlab.cluster_name}"
+                        value       =  module.gke-gitlab.cluster_name
                         description = "Name of the GKE cluster that GitLab is deployed in."
                       }
 
                       output "cluster_location" {
-                        value       = "${module.gke-gitlab.cluster_location}"
+                        value       = module.gke-gitlab.cluster_location
                         description = "Location of the GKE cluster that GitLab is deployed in."
                       }
 
                       output "cluster_ca_certificate" {
-                        value       = "${module.gke-gitlab.cluster_ca_certificate}"
+                        value       = module.gke-gitlab.cluster_ca_certificate
                         description = "CA Certificate for the GKE cluster that GitLab is deployed in."
                         sensitive = true
                       }
 
                       output "host" {
-                        value       = "${module.gke-gitlab.host}"
+                        value       = module.gke-gitlab.host
                         description = "Host for the GKE cluster that GitLab is deployed in."
                       }
 
                       output "token" {
-                        value       = "${module.gke-gitlab.token}"
+                        value       = module.gke-gitlab.token
                         description = "Token for the GKE cluster that GitLab is deployed in."
                         sensitive = true
                       }
