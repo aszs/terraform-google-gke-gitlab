@@ -180,7 +180,7 @@ resource "google_sql_database_instance" "gitlab_db" {
   database_version = "POSTGRES_11"
 
   settings {
-    tier            = "db-custom-4-15360"
+    tier            = "db-custom-1-3840"
     disk_autoresize = true
 
     ip_configuration {
@@ -212,7 +212,7 @@ resource "google_sql_user" "gitlab" {
 resource "google_redis_instance" "gitlab" {
   name               = "gitlab"
   tier               = "STANDARD_HA"
-  memory_size_gb     = 5
+  memory_size_gb     = 1
   region             = var.region
   authorized_network = google_compute_network.gitlab.self_link
 
@@ -379,6 +379,18 @@ resource "kubernetes_secret" "gitlab_gcs_credentials" {
 
   data = {
     gcs-application-credentials-file = base64decode(google_service_account_key.gitlab_gcs.private_key)
+  }
+
+  depends_on = [time_sleep.sleep_for_cluster_fix_helm_6361]
+}
+
+resource "kubernetes_secret" "sendgrid_key" {
+  metadata {
+    name = "sendgrid-key"
+  }
+
+  data = {
+    sendgrid-key = var.sendgrid_apikey
   }
 
   depends_on = [time_sleep.sleep_for_cluster_fix_helm_6361]

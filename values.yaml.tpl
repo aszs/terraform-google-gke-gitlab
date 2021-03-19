@@ -89,6 +89,20 @@ global:
         secret: gitlab-rails-storage
         key: connection
 
+  smtp:
+    enabled: true
+    address: "smtp.sendgrid.net" 
+    port: 587
+    user_name: "apikey"
+    password:
+      secret: "sendgrid-key"
+      key: sendgrid-key
+    domain: "smtp.sendgrid.net"
+    authentication: "plain"
+    starttls_auto: true
+    tls: false
+
+
 certmanager-issuer:
   email: ${CERT_MANAGER_EMAIL}
 
