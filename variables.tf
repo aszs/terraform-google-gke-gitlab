@@ -92,3 +92,15 @@ variable "sendgrid_apikey" {
   default     = ""
   // sensitive   = true // uncomment when we upgrade to terraform 0.14
 }
+
+// these defaults are for testing and are private so you probably will get an unauthorized error
+variable "google_oauth2_client_id" {
+  type        = string
+  default     = "1093863487317-3kr2n1nqebamf9s3v1n5nvm5vjdeq5le.apps.googleusercontent.com"
+}
+
+variable "google_oauth2_client_secret" {
+  type        = string
+  default     = "w6UGNVZJrNfZkOrKeeO4JgtT"
+  // sensitive   = true // uncomment when we upgrade to terraform 0.14
+}
