@@ -89,9 +89,30 @@ global:
         secret: gitlab-rails-storage
         key: connection
 
+    omniauth:
+      enabled: true
+      autoSignInWithProvider:
+      syncProfileFromProvider: ['google_oauth2']
+      syncProfileAttributes: ['name', 'email', 'location']
+      allowSingleSignOn: true
+      blockAutoCreatedUsers: true
+      autoLinkLdapUser: false
+      autoLinkSamlUser: false
+      autoLinkUser: ['saml']
+      externalProviders: [] # we'll want to set this when we open up to the public
+      allowBypassTwoFactor: []
+      providers:
+       - secret: gitlab-google-oauth2
+         key: provider
+
+  email:
+    display_name: OneCommons
+    from:     noreply@onecommons.org
+    reply_to: noreply@onecommons.org
+
   smtp:
     enabled: true
-    address: "smtp.sendgrid.net" 
+    address: "smtp.sendgrid.net"
     port: 587
     user_name: "apikey"
     password:
@@ -148,6 +169,7 @@ gitlab-runner:
   rbac:
     create: true
   runners:
+    privileged: true
     locked: false
     cache:
       cacheType: gcs

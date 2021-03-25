@@ -173,6 +173,14 @@ resource "google_service_networking_connection" "private_vpc_connection" {
   depends_on              = [module.project_services.project_id]
 }
 
+// tier - (Required) The machine type to use. See tiers for more details and supported versions. Postgres supports only shared-core machine types such as db-f1-micro, and custom machine types such as db-custom-2-13312.
+// When selecting the number of CPUs and amount of memory, there are some restrictions on the configuration you choose:
+// vCPUs must be either 1 or an even number between 2 and 96.
+// Memory must be:
+// 0.9 to 6.5 GB per vCPU
+// A multiple of 256 MB
+// At least 3.75 GB (3840 MB)
+
 resource "google_sql_database_instance" "gitlab_db" {
   depends_on       = [google_service_networking_connection.private_vpc_connection]
   name             = local.gitlab_db_name
@@ -407,6 +415,26 @@ data "google_compute_address" "gitlab" {
 locals {
   gitlab_address = var.gitlab_address_name == "" ? google_compute_address.gitlab.0.address : data.google_compute_address.gitlab.0.address
   domain         = var.domain != "" ? var.domain : "${local.gitlab_address}.xip.io"
+}
+
+resource "kubernetes_secret" "gitlab_google_oauth2" {
+  metadata {
+    name = "gitlab-google-oauth2"
+  }
+
+  data = {
+    provider = <<EOT
+    name: google_oauth2
+    label: Google
+    app_id: ${var.google_oauth2_client_id}
+    app_secret: ${var.google_oauth2_client_secret}
+    args:
+      access_type: offline
+      approval_prompt: ''
+EOT
+  }
+
+  depends_on = [time_sleep.sleep_for_cluster_fix_helm_6361]
 }
 
 data "template_file" "helm_values" {
