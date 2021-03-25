@@ -178,6 +178,7 @@ resource "google_sql_database_instance" "gitlab_db" {
   name             = local.gitlab_db_name
   region           = var.region
   database_version = "POSTGRES_11"
+  deletion_protection = false
 
   settings {
     tier            = "db-custom-1-3840"
@@ -462,13 +463,14 @@ resource "helm_release" "external_dns" {
     provider: google
     google:
       project: ${var.project_id}
-    txtOwnerId: gitlab
+    txtOwnerId: "gitlab-dev"
     rbac:
       create: true
     policy: sync
     domainFilters: [${local.domain}]
     serviceAccount:
-      annotations: ${google_service_account.gitlab_dns.email}
+      annotations:
+        iam.gke.io/gcp-service-account: ${google_service_account.gitlab_dns.email}
   EOT
   ]
 }

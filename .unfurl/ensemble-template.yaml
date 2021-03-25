@@ -35,7 +35,6 @@ spec:
                         project_id         = "{{ '::inputs::project_id' | eval }}"
                         certmanager_email  = "{{ '::inputs::certmanager_email' | eval }}"
                         domain = "{{ '::inputs::domain' | eval }}"
-                        sendgrid_apikey = var.sendgrid_apikey
                       }
 
                       variable "sendgrid_apikey" {
