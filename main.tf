@@ -496,7 +496,8 @@ resource "helm_release" "external_dns" {
     policy: sync
     domainFilters: [${local.domain}]
     serviceAccount:
-      annotations: ${google_service_account.gitlab_dns.email}
+      annotations:
+        iam.gke.io/gcp-service-account: ${google_service_account.gitlab_dns.email}
   EOT
   ]
 }
