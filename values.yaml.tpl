@@ -148,18 +148,18 @@ gitlab:
           gcpProject: ${PROJECT_ID}
   # oc
     image:
-      tag: master
+      tag: ${TAG}
   migrations:
     image:
-      tag: master
+      tag: ${TAG}
   sidekiq:
     image:
-      tag: master
+      tag: ${TAG}
   webservice:
     image:
-      tag: master
+      tag: ${TAG}
     workhorse:
-      tag: master
+      tag: ${TAG}
 
 postgresql:
   install: false

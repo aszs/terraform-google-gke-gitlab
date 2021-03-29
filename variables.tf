@@ -104,3 +104,9 @@ variable "google_oauth2_client_secret" {
   default     = "w6UGNVZJrNfZkOrKeeO4JgtT"
   // sensitive   = true // uncomment when we upgrade to terraform 0.14
 }
+
+variable "containers_tag" {
+  type        = string
+  description = "tag of containers pulled by the gitlab helm chart"
+  default = "master"
+}

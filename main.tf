@@ -448,6 +448,7 @@ data "template_file" "helm_values" {
     PROJECT_ID            = var.project_id
     CERT_MANAGER_EMAIL    = var.certmanager_email
     GITLAB_RUNNER_INSTALL = var.gitlab_runner_install
+    TAG                   = var.containers_tag
   }
 }
 
@@ -496,7 +497,8 @@ resource "helm_release" "external_dns" {
     policy: sync
     domainFilters: [${local.domain}]
     serviceAccount:
-      annotations: ${google_service_account.gitlab_dns.email}
+      annotations:
+        iam.gke.io/gcp-service-account: ${google_service_account.gitlab_dns.email}
   EOT
   ]
 }

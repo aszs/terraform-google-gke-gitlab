@@ -10,6 +10,9 @@ spec:
           type: string
         domain:
           type: string
+        containers_tag:
+          type: string
+          default: "master"
       node_templates:
         gitlab:
           # this will create google project
@@ -36,6 +39,7 @@ spec:
                         certmanager_email  = "{{ '::inputs::certmanager_email' | eval }}"
                         domain = "{{ '::inputs::domain' | eval }}"
                         sendgrid_apikey = var.sendgrid_apikey
+                        containers_tag = "{{ '::inputs::containers_tag' | eval }}"
                       }
 
                       variable "sendgrid_apikey" {
