@@ -146,6 +146,8 @@ gitlab:
           secret: google-application-credentials
           key: gcs-application-credentials-file
           gcpProject: ${PROJECT_ID}
+      enabled: true
+      schedule: "0 0 * *"
   # oc
     image:
       tag: ${TAG}
