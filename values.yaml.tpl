@@ -4,7 +4,8 @@ global:
   hosts:
     domain: ${DOMAIN}
     https: true
-    gitlab: {}
+    gitlab: # see https://docs.gitlab.com/charts/charts/globals#configure-host-settings
+      name: app.${DOMAIN}
     externalIP: ${INGRESS_IP}
     ssh: ~
 
