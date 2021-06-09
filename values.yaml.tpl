@@ -141,14 +141,17 @@ gitlab:
       storageClass: "pd-ssd"
   task-runner:
     backups:
+      enabled: true
+      cron:
+        enabled: true
+        # daily at midnight, GCP project time
+        schedule: "0 0 * * *"
       objectStorage:
         backend: gcs
         config:
           secret: google-application-credentials
           key: gcs-application-credentials-file
           gcpProject: ${PROJECT_ID}
-      enabled: true
-      schedule: "0 0 * *"
   # oc
     image:
       tag: ${TAG}

@@ -28,7 +28,7 @@ spec:
                 resultTemplate: |
                   # merge all outputs into attributes
                   attributes:
-                    <<: "{{ outputs | mapValue | to_json }}"
+                    <<: {{ outputs | mapValue | to_json }}
                 main:
                   eval:
                     # terraform module expects a source to be a relative path
