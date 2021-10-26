@@ -70,6 +70,8 @@ module "project_services" {
   disable_services_on_destroy = false
 
   activate_apis = [
+    "bigquery.googleapis.com",
+    "bigquerydatatransfer.googleapis.com",
     "compute.googleapis.com",
     "container.googleapis.com",
     "servicenetworking.googleapis.com",
@@ -277,6 +279,15 @@ resource "google_storage_bucket" "gitlab-runner-cache" {
   location      = var.region
   force_destroy = var.allow_force_destroy
 }
+
+
+resource "google_bigquery_dataset" "kube_usage" {
+  dataset_id                  = "kube_usage"
+  friendly_name               = "kube_usage"
+  description                 = "This is a dataset for kubernetes usage"
+  location                    = "US"
+}
+
 // GKE Cluster
 module "gke" {
   source  = "terraform-google-modules/kubernetes-engine/google"
@@ -297,6 +308,10 @@ module "gke" {
   subnetwork        = google_compute_subnetwork.subnetwork.name
   ip_range_pods     = "gitlab-cluster-pod-cidr"
   ip_range_services = "gitlab-cluster-service-cidr"
+  horizontal_pod_autoscaling = true
+  enable_vertical_pod_autoscaling = true
+  resource_usage_export_dataset_id = google_bigquery_dataset.kube_usage.dataset_id
+
 
   issue_client_certificate = true
 
