@@ -72,17 +72,17 @@ module "project_services" {
   activate_apis = [
     "bigquery.googleapis.com",
     "bigquerydatatransfer.googleapis.com",
-    "compute.googleapis.com",
-    "container.googleapis.com",
-    "servicenetworking.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "redis.googleapis.com",
-
-    "serviceusage.googleapis.com",
     "cloudbilling.googleapis.com",
     "cloudkms.googleapis.com",
-    "storage-api.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "compute.googleapis.com",
+    "container.googleapis.com",
     "dns.googleapis.com",
+    "redis.googleapis.com",
+    "servicenetworking.googleapis.com",
+    
+    "serviceusage.googleapis.com",
+    "storage-api.googleapis.com",
   ]
 }
 
@@ -104,13 +104,13 @@ resource "google_project_iam_member" "project" {
 }
 
 // external-dns service account
-resource "google_service_account" "gitlab_dns" {
+/* resource "google_service_account" "gitlab_dns" {
   project      = var.project_id
   account_id   = "gitlab-dns"
   display_name = "External DNS"
-}
+} */
 
-resource "google_service_account_iam_member" "gitlab_dns_iam" {
+/* resource "google_service_account_iam_member" "gitlab_dns_iam" {
   service_account_id = google_service_account.gitlab_dns.name
   role               = "roles/iam.workloadIdentityUser"
   member             =  "serviceAccount:${var.project_id}.svc.id.goog[kube-system/external-dns]"
@@ -120,7 +120,7 @@ resource "google_project_iam_member" "external_dns" {
   project = var.project_id
   role    = "roles/dns.admin"
   member  = "serviceAccount:${google_service_account.gitlab_dns.email}"
-}
+} */
 
 // Networking
 resource "google_compute_network" "gitlab" {
@@ -318,8 +318,10 @@ module "gke" {
   node_pools = [
     {
       name         = "gitlab"
-      autoscaling  = false
+      autoscaling  = true
       machine_type = var.gke_machine_type
+      auto_repair = true
+      auto_upgrade = true
       node_count   = 1
     },
   ]
@@ -502,7 +504,7 @@ resource "helm_release" "gitlab" {
   ]
 }
 
-resource "helm_release" "external_dns" {
+/* resource "helm_release" "external_dns" {
   name       = "external-dns"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "external-dns"
@@ -524,4 +526,4 @@ resource "helm_release" "external_dns" {
         iam.gke.io/gcp-service-account: ${google_service_account.gitlab_dns.email}
   EOT
   ]
-}
+} */
