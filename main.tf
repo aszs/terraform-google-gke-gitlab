@@ -312,7 +312,15 @@ module "gke" {
   enable_vertical_pod_autoscaling = true
   resource_usage_export_dataset_id = google_bigquery_dataset.kube_usage.dataset_id
 
-
+  cluster_autoscaling = {
+    enabled             = true
+    autoscaling_profile = "OPTIMIZE_UTILIZATION"
+    max_cpu_cores       = 12
+    min_cpu_cores       = 2
+    max_memory_gb       = 30
+    min_memory_gb       = 4
+    gpu_resources       = []
+  }
   issue_client_certificate = true
 
   node_pools = [
